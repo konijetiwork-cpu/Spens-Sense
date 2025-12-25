@@ -1,0 +1,7 @@
+{
+  "name": "Spend Sense AI v2",
+  "description": "Multi-user, AI-powered financial ledger with deep SMS parsing and personalized themes.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

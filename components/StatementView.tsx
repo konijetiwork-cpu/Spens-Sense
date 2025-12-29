@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Transaction, LedgerGroup, TransactionType } from '../types';
 
 interface Props {
@@ -9,8 +9,6 @@ interface Props {
 }
 
 const StatementView: React.FC<Props> = ({ transactions, ledgers, onExport }) => {
-  const [activeTab, setActiveTab] = useState<'hierarchy' | 'detailed'>('hierarchy');
-
   const getSubgroupTotal = (subgroupId: string) => 
     transactions.filter(t => t.subgroupId === subgroupId).reduce((sum, t) => sum + t.amount, 0);
   
@@ -89,7 +87,7 @@ const StatementView: React.FC<Props> = ({ transactions, ledgers, onExport }) => 
       <div className="flex flex-col md:flex-row justify-between items-start gap-6">
         <div>
           <h1 className="text-3xl font-black text-slate-900 tracking-tighter">Vault Analytics</h1>
-          <p className="text-xs text-slate-400 font-black uppercase tracking-widest mt-1">Hierarchical Ledger & Detailed Audit</p>
+          <p className="text-xs text-slate-400 font-black uppercase tracking-widest mt-1">Hierarchical Financial Report</p>
         </div>
         <div className="flex flex-wrap gap-3">
            <button onClick={onExport} className="bg-white border text-slate-600 px-5 py-3 rounded-2xl font-black text-[10px] flex items-center gap-2 uppercase tracking-widest shadow-sm hover:bg-slate-50 transition-all">
@@ -102,66 +100,10 @@ const StatementView: React.FC<Props> = ({ transactions, ledgers, onExport }) => 
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-1 bg-slate-200/50 p-1.5 rounded-[2rem] w-fit">
-        <button 
-          onClick={() => setActiveTab('hierarchy')}
-          className={`px-8 py-3 rounded-[1.8rem] text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'hierarchy' ? 'bg-white text-indigo-600 shadow-md' : 'text-slate-500 hover:text-slate-700'}`}
-        >
-          Hierarchy View
-        </button>
-        <button 
-          onClick={() => setActiveTab('detailed')}
-          className={`px-8 py-3 rounded-[1.8rem] text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'detailed' ? 'bg-white text-indigo-600 shadow-md' : 'text-slate-500 hover:text-slate-700'}`}
-        >
-          Detailed Audit
-        </button>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        {renderHierarchySection(TransactionType.CREDIT)}
+        {renderHierarchySection(TransactionType.DEBIT)}
       </div>
-
-      {activeTab === 'hierarchy' ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {renderHierarchySection(TransactionType.CREDIT)}
-          {renderHierarchySection(TransactionType.DEBIT)}
-        </div>
-      ) : (
-        <div className="bg-white rounded-[2.5rem] border shadow-sm overflow-hidden overflow-x-auto">
-          <table className="w-full text-left text-sm whitespace-nowrap">
-            <thead className="bg-slate-50 border-b text-[10px] font-black text-slate-400 uppercase tracking-widest">
-              <tr>
-                <th className="px-6 py-4">Date</th>
-                <th className="px-6 py-4">Bank Account</th>
-                <th className="px-6 py-4">Transaction Type</th>
-                <th className="px-6 py-4">Ref No.</th>
-                <th className="px-6 py-4">Group</th>
-                <th className="px-6 py-4">Sub-ledger</th>
-                <th className="px-6 py-4">Purpose</th>
-                <th className="px-6 py-4 text-right">Amount</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y text-slate-700 font-bold">
-              {transactions.map(t => (
-                <tr key={t.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-6 py-4 text-slate-400 text-[10px] font-medium">{t.date}</td>
-                  <td className="px-6 py-4 text-slate-800">{t.bankName}</td>
-                  <td className={`px-6 py-4 tracking-tighter ${t.type === TransactionType.CREDIT ? 'text-emerald-500' : 'text-rose-500'}`}>
-                    {t.type === TransactionType.CREDIT ? 'RECEIPT' : 'PAYMENT'}
-                  </td>
-                  <td className="px-6 py-4 font-mono text-[9px] opacity-40">{t.refNo}</td>
-                  <td className="px-6 py-4">{ledgers.find(l => l.id === t.groupId)?.name || 'N/A'}</td>
-                  <td className="px-6 py-4 font-normal text-slate-400">{ledgers.find(l => l.id === t.groupId)?.subgroups.find(s => s.id === t.subgroupId)?.name || 'N/A'}</td>
-                  <td className="px-6 py-4 italic truncate max-w-[150px] font-normal text-slate-500">{t.purpose}</td>
-                  <td className={`px-6 py-4 text-right font-black ${t.type === TransactionType.CREDIT ? 'text-emerald-600' : 'text-rose-600'}`}>
-                    ₹{t.amount.toLocaleString()}
-                  </td>
-                </tr>
-              ))}
-              {transactions.length === 0 && (
-                <tr><td colSpan={8} className="p-20 text-center italic text-slate-300">No transaction records found in the vault.</td></tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
     </div>
   );
 };

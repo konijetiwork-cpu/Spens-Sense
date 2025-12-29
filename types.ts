@@ -42,6 +42,25 @@ export interface ActivityLog {
   undone?: boolean;
 }
 
+export interface DailyNote {
+  id: string;
+  date: string;
+  title: string;
+  content: string;
+  timestamp: number;
+}
+
+export interface Receivable {
+  id: string;
+  date: string;
+  debtorName: string;
+  amount: number;
+  purpose: string;
+  dueDate: string;
+  isSettled: boolean;
+  timestamp: number;
+}
+
 export interface Reminder {
   id: string;
   message: string;
@@ -78,4 +97,4 @@ export interface User {
   profile?: UserProfile;
 }
 
-export type ViewType = 'dashboard' | 'transactions' | 'ledger' | 'statement' | 'settings' | 'admin';
+export type ViewType = 'dashboard' | 'transactions' | 'ledger' | 'statement' | 'notes' | 'settings' | 'admin';
